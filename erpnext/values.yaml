@@ -355,14 +355,22 @@ jobs:
     adminPassword: "changeit"
     adminExistingSecret: ""
     adminExistingSecretKey: "password"
-    installApps:
-    - "erpnext"
     dbType: "mariadb"
     backoffLimit: 0
     resources: {}
     nodeSelector: {}
     tolerations: []
     affinity: {}
+
+    sites:
+      - name: "erp.cluster.local"
+        installApps:
+          - "erpnext"
+          - "helpdesk"
+      # - name: "accounts.cluster.local"
+      #   installApps:
+      #     - "erpnext"
+      #     - "payments"
 
   dropSite:
     # jobName: ""
