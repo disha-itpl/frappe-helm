@@ -1,22 +1,22 @@
-{{- if .Values.jobs.createSite.enabled }}
+{{- if .Values.jobs.createMultipleSite.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  {{- if .Values.jobs.createSite.jobName }}
-  name: {{ .Values.jobs.createSite.jobName }}
+  {{- if .Values.jobs.createMultipleSite.jobName }}
+  name: {{ .Values.jobs.createMultipleSite.jobName }}
   {{- else }}
   name: {{ template "erpnext.fullname" . }}-new-site-{{ now | date "20060102150405" }}
   {{- end }}
   labels:
     {{- include "erpnext.labels" . | nindent 4 }}
   annotations:
-{{- with .Values.jobs.createSite.annotations }}
+{{- with .Values.jobs.createMultipleSite.annotations }}
 {{- range $key, $value := . }}
     {{ $key }}: {{ $value | quote }}
 {{- end }}
 {{- end }}
 spec:
-  backoffLimit: {{ .Values.jobs.createSite.backoffLimit }}
+  backoffLimit: {{ .Values.jobs.createMultipleSite.backoffLimit }}
   template:
     spec:
     {{- with .Values.imagePullSecrets }}
@@ -70,13 +70,13 @@ spec:
               value: "5432"
               {{- else if .Values.dbPort }}
               value: {{ .Values.dbPort | quote }}
-              {{- else if eq .Values.jobs.createSite.dbType "mariadb" }}
+              {{- else if eq .Values.jobs.createMultipleSite.dbType "mariadb" }}
               value: "3306"
-              {{- else if eq .Values.jobs.createSite.dbType "postgres" }}
+              {{- else if eq .Values.jobs.createMultipleSite.dbType "postgres" }}
               value: "5432"
               {{- end }}
           resources:
-            {{- toYaml .Values.jobs.createSite.resources | nindent 12 }}
+            {{- toYaml .Values.jobs.createMultipleSite.resources | nindent 12 }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           volumeMounts:
@@ -91,28 +91,31 @@ spec:
           - >
             set -x;
 
-            bench_output=$(bench new-site ${SITE_NAME} --no-mariadb-socket --db-type=${DB_TYPE} --db-host=${DB_HOST} --db-port=${DB_PORT} --admin-password=${ADMIN_PASSWORD} --mariadb-root-username=${DB_ROOT_USER} --mariadb-root-password=${DB_ROOT_PASSWORD} {{- if .Values.jobs.createSite.installApps }} {{- range .Values.jobs.createSite.installApps }} --install-app={{ . }} {{- end }} {{- end }} {{- if .Values.jobs.createSite.forceCreate }} --force {{- end }} | tee /dev/stderr);
+            {{- range $site := .Values.jobs.createMultipleSite.sites }}
+
+            bench_output=$(bench new-site {{ $site.name }} --no-mariadb-socket --db-type=${DB_TYPE} --db-host=${DB_HOST} --db-port=${DB_PORT} --admin-password=${ADMIN_PASSWORD} --mariadb-root-username=${DB_ROOT_USER} --mariadb-root-password=${DB_ROOT_PASSWORD}{{- if $.Values.jobs.createMultipleSite.forceCreate }} --force{{- end }}{{- if $site.installApps }}{{- range $site.installApps }} --install-app={{ . }}{{- end }}{{- end }} | tee /dev/stderr);
 
             bench_exit_status=$?;
 
             if [ $bench_exit_status -ne 0 ]; then
-                # Don't consider the case "site already exists" an error.
-                if [[ $bench_output == *"already exists"* ]]; then
-                    echo "Site already exists, continuing...";
+                if [[ "$bench_output" == *"already exists"* ]]; then
+                    echo "Site {{ $site.name }} already exists, continuing...";
                 else
-                    echo "An error occurred in bench new-site: $bench_output"
+                    echo "An error occurred while creating site {{ $site.name }}";
                     exit $bench_exit_status;
                 fi
-            fi
+            fi;
+
+            {{- end }}
 
             set -e;
+            rm -f currentsite.txt;
 
-            rm -f currentsite.txt
         env:
           - name: "SITE_NAME"
-            value: "{{ .Values.jobs.createSite.siteName }}"
+            value: "{{ .Values.jobs.createMultipleSite.siteName }}"
           - name: "DB_TYPE"
-            value: {{ .Values.jobs.createSite.dbType }}
+            value: {{ .Values.jobs.createMultipleSite.dbType }}
           - name: DB_HOST
             {{- if or .Values.mariadb.enabled (get .Values "mariadb-subchart").enabled }}
             value: {{ .Release.Name }}-mariadb-subchart
@@ -132,9 +135,9 @@ spec:
             value: "5432"
             {{- else if .Values.dbPort }}
             value: {{ .Values.dbPort | quote }}
-            {{- else if eq .Values.jobs.createSite.dbType "mariadb" }}
+            {{- else if eq .Values.jobs.createMultipleSite.dbType "mariadb" }}
             value: "3306"
-            {{- else if eq .Values.jobs.createSite.dbType "postgresql" }}
+            {{- else if eq .Values.jobs.createMultipleSite.dbType "postgresql" }}
             value: "5432"
             {{- end }}
           - name: "DB_ROOT_USER"
@@ -178,16 +181,16 @@ spec:
                 name: {{ template "erpnext.fullname" . }}
             {{- end }}
           - name: "ADMIN_PASSWORD"
-            {{- if .Values.jobs.createSite.adminExistingSecret }}
+            {{- if .Values.jobs.createMultipleSite.adminExistingSecret }}
             valueFrom:
               secretKeyRef:
-                key: {{ .Values.jobs.createSite.adminExistingSecretKey }}
-                name: {{ .Values.jobs.createSite.adminExistingSecret }}
+                key: {{ .Values.jobs.createMultipleSite.adminExistingSecretKey }}
+                name: {{ .Values.jobs.createMultipleSite.adminExistingSecret }}
             {{- else}}
-            value: "{{ .Values.jobs.createSite.adminPassword }}"
+            value: "{{ .Values.jobs.createMultipleSite.adminPassword }}"
             {{- end }}
         resources:
-          {{- toYaml .Values.jobs.createSite.resources | nindent 10 }}
+          {{- toYaml .Values.jobs.createMultipleSite.resources | nindent 10 }}
         securityContext:
           {{- toYaml $.Values.securityContext | nindent 10 }}
         volumeMounts:
@@ -221,15 +224,15 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
-      {{- with .Values.jobs.createSite.nodeSelector }}
+      {{- with .Values.jobs.createMultipleSite.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.jobs.createSite.affinity }}
+      {{- with .Values.jobs.createMultipleSite.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.jobs.createSite.tolerations }}
+      {{- with .Values.jobs.createMultipleSite.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

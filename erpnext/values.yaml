@@ -349,9 +349,23 @@ jobs:
 
   createSite:
     # jobName: ""
-    enabled: false
+    enabled: true
     forceCreate: false
     siteName: "erp.cluster.local"
+    adminPassword: "changeit"
+    adminExistingSecret: ""
+    adminExistingSecretKey: "password"
+    dbType: "mariadb"
+    backoffLimit: 0
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+  createMultipleSite:
+    # jobName: ""
+    enabled: false
+    forceCreate: false
     adminPassword: "changeit"
     adminExistingSecret: ""
     adminExistingSecretKey: "password"
