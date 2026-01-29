@@ -3,7 +3,7 @@ entries:
   erpnext:
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.578855152+05:30"
+    created: "2026-01-29T13:02:59.633445856+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -36,7 +36,7 @@ entries:
       repository: oci://ghcr.io/dragonflydb/dragonfly/helm
       version: v1.34.2
     description: Kubernetes Helm Chart for the latest stable ERPNext branch
-    digest: 2f3884a52385676d3bb35dcd6a9ff9290d78482114a3070c5d5e06c0675ba0f9
+    digest: 51ea8d095b041843c42f4cb08202209af4511b94b9d172095d781270aa53e6e9
     icon: https://raw.githubusercontent.com/frappe/erpnext/develop/erpnext/public/images/erpnext-logo.png
     name: erpnext
     type: application
@@ -45,7 +45,7 @@ entries:
     version: 8.10.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.66740996+05:30"
+    created: "2026-01-29T13:02:59.719257714+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -87,7 +87,7 @@ entries:
     version: 8.9.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.657481636+05:30"
+    created: "2026-01-29T13:02:59.707506211+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -129,7 +129,7 @@ entries:
     version: 8.8.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.646722401+05:30"
+    created: "2026-01-29T13:02:59.696000622+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -171,7 +171,7 @@ entries:
     version: 8.7.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.635496691+05:30"
+    created: "2026-01-29T13:02:59.685174736+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -213,7 +213,7 @@ entries:
     version: 8.6.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.622497832+05:30"
+    created: "2026-01-29T13:02:59.673720481+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -255,7 +255,7 @@ entries:
     version: 8.5.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.611834141+05:30"
+    created: "2026-01-29T13:02:59.663204556+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -297,7 +297,7 @@ entries:
     version: 8.4.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.600520709+05:30"
+    created: "2026-01-29T13:02:59.653126051+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -339,7 +339,7 @@ entries:
     version: 8.3.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.589777747+05:30"
+    created: "2026-01-29T13:02:59.643447533+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -381,7 +381,7 @@ entries:
     version: 8.2.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.569127344+05:30"
+    created: "2026-01-29T13:02:59.623419104+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -423,7 +423,7 @@ entries:
     version: 8.1.0
   - apiVersion: v2
     appVersion: v16.1.0
-    created: "2026-01-29T12:46:03.557395349+05:30"
+    created: "2026-01-29T13:02:59.612684224+05:30"
     dependencies:
     - alias: mariadb-subchart
       condition: mariadb.enabled,mariadb-subchart.enabled
@@ -463,4 +463,4 @@ entries:
     urls:
     - https://disha-itpl.github.io/frappe-helm/erpnext-8.0.17.tgz
     version: 8.0.17
-generated: "2026-01-29T12:46:03.536312275+05:30"
+generated: "2026-01-29T13:02:59.602032245+05:30"
