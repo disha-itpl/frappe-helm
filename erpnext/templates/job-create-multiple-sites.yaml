@@ -1,4 +1,4 @@
-{{- if .Values.jobs.createMultipleSite.enabled }}
+{{- if and .Values.jobs.createMultipleSites.enabled (not .Values.jobs.createSite.enabled) }}
 apiVersion: batch/v1
 kind: Job
 metadata:

@@ -347,6 +347,18 @@ jobs:
     command: []
     args: []
 
+  # ------------------------------------------------------------------------------
+  # Site creation jobs
+  #
+  # IMPORTANT:
+  # - Only ONE site-creation job should be enabled at a time.
+  # - If BOTH `createSite.enabled` and `createMultipleSite.enabled` are set to true,
+  #   then `createSite` will take precedence and `createMultipleSite` will be ignored.
+  #
+  # Backward compatibility:
+  # - `createSite` is enabled by default to preserve existing behavior.
+  # ------------------------------------------------------------------------------
+
   createSite:
     # jobName: ""
     enabled: true
@@ -362,9 +374,9 @@ jobs:
     tolerations: []
     affinity: {}
 
-  createMultipleSite:
+  createMultipleSites:
     # jobName: ""
-    enabled: false
+    enabled: false 
     forceCreate: false
     adminPassword: "changeit"
     adminExistingSecret: ""
