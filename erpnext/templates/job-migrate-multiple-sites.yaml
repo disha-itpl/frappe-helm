@@ -1,0 +1,89 @@
+{{- if and .Values.jobs.migrateMultipleSites.enabled (not .Values.jobs.migrate.enabled) }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  {{- if .Values.jobs.migrateMultipleSites.jobName }}
+  name: {{ .Values.jobs.migrateMultipleSites.jobName }}
+  {{- else }}
+  name: {{ template "erpnext.fullname" . }}-migrate-sites-{{ now | date "20060102150405" }}
+  {{- end }}
+  labels:
+    {{- include "erpnext.labels" . | nindent 4 }}
+spec:
+  backoffLimit: {{ .Values.jobs.migrateMultipleSites.backoffLimit }}
+  template:
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ template "erpnext.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+
+      containers:
+      - name: migrate-sites
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["bash", "-c"]
+        args:
+          - >
+            set -e;
+
+            {{- range $site := .Values.jobs.migrateMultipleSites.sites }}
+
+            echo "Putting site {{ $site.name }} into maintenance mode";
+            bench --site {{ $site.name }} set-maintenance-mode on;
+
+            echo "Migrating site {{ $site.name }}";
+            bench --site {{ $site.name }} migrate {{ if $.Values.jobs.migrateMultipleSites.skipFailing }}--skip-failing{{ end }};
+
+            echo "Disabling maintenance mode for site {{ $site.name }}";
+            bench --site {{ $site.name }} set-maintenance-mode off;
+
+            {{- end }}
+
+        resources:
+          {{- toYaml .Values.jobs.migrateMultipleSites.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml $.Values.securityContext | nindent 10 }}
+        volumeMounts:
+          - name: sites-dir
+            mountPath: /home/frappe/frappe-bench/sites
+          - name: logs
+            mountPath: /home/frappe/frappe-bench/logs
+
+      restartPolicy: Never
+
+      volumes:
+        - name: sites-dir
+          {{- if .Values.persistence.worker.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ default (template "erpnext.fullname" .) .Values.persistence.worker.existingClaim }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+
+        - name: logs
+          {{- if .Values.persistence.logs.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ default (printf "%s-logs" (template "erpnext.fullname" .)) .Values.persistence.logs.existingClaim }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+
+      {{- with .Values.jobs.migrateMultipleSites.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.jobs.migrateMultipleSites.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.jobs.migrateMultipleSites.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
