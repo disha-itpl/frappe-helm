@@ -34,8 +34,7 @@ spec:
 
             echo "Starting backup for site {{ $site.name }}";
 
-            bench --site={{ $site.name }} \
-              {{- if $.Values.jobs.backupMultipleSites.withFiles }} backup --with-files {{- else }} backup {{- end }};
+            bench --site={{ $site.name }} {{- if $.Values.jobs.backupMultipleSites.withFiles }} backup --with-files {{- else }} backup {{- end }};
 
             echo "Backup completed for site {{ $site.name }}";
 
