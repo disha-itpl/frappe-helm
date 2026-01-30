@@ -20,7 +20,6 @@ spec:
       serviceAccountName: {{ template "erpnext.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-
       containers:
       - name: backup-sites
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -28,18 +27,9 @@ spec:
         command: ["bash", "-c"]
         args:
           - >
-            set -e;
-
             {{- range $site := .Values.jobs.backupMultipleSites.sites }}
-
-            echo "Starting backup for site {{ $site.name }}";
-
-            bench --site={{ $site.name }} {{- if $.Values.jobs.backupMultipleSites.withFiles }} backup --with-files {{- else }} backup {{- end }};
-
-            echo "Backup completed for site {{ $site.name }}";
-
+            bench --site={{ $site }} {{- if $.Values.jobs.backupMultipleSites.withFiles }} backup --with-files; {{- else }} backup; {{- end }}
             {{- end }}
-
         resources:
           {{- toYaml .Values.jobs.backupMultipleSites.resources | nindent 10 }}
         securityContext:
@@ -49,36 +39,40 @@ spec:
             mountPath: /home/frappe/frappe-bench/sites
           - name: logs
             mountPath: /home/frappe/frappe-bench/logs
-
       restartPolicy: Never
-
       volumes:
         - name: sites-dir
           {{- if .Values.persistence.worker.enabled }}
           persistentVolumeClaim:
-            claimName: {{ default (template "erpnext.fullname" .) .Values.persistence.worker.existingClaim }}
+            {{- if .Values.persistence.worker.existingClaim }}
+            claimName: {{ .Values.persistence.worker.existingClaim }}
+            {{- else }}
+            claimName: {{ template "erpnext.fullname" . }}
+            {{- end }}
+            readOnly: false
           {{- else }}
           emptyDir: {}
           {{- end }}
-
         - name: logs
           {{- if .Values.persistence.logs.enabled }}
           persistentVolumeClaim:
-            claimName: {{ default (printf "%s-logs" (template "erpnext.fullname" .)) .Values.persistence.logs.existingClaim }}
+            {{- if .Values.persistence.logs.existingClaim }}
+            claimName: {{ .Values.persistence.logs.existingClaim }}
+            {{- else }}
+            claimName: {{ template "erpnext.fullname" . }}-logs
+            {{- end }}
+            readOnly: false
           {{- else }}
           emptyDir: {}
           {{- end }}
-
       {{- with .Values.jobs.backupMultipleSites.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
       {{- with .Values.jobs.backupMultipleSites.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
       {{- with .Values.jobs.backupMultipleSites.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
