@@ -5,7 +5,7 @@ metadata:
   {{- if .Values.jobs.createMultipleSites.jobName }}
   name: {{ .Values.jobs.createMultipleSites.jobName }}
   {{- else }}
-  name: {{ template "erpnext.fullname" . }}-new-multiple-sites-{{ now | date "20060102150405" }}
+  name: {{ template "erpnext.fullname" . }}-new-sites-{{ now | date "20060102150405" }}
   {{- end }}
   labels:
     {{- include "erpnext.labels" . | nindent 4 }}
