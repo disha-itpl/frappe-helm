@@ -28,9 +28,9 @@ spec:
         args:
           - >
             {{- range $site := .Values.jobs.migrateMultipleSites.sites }}
-            bench --site {{ $site }} set-maintenance-mode on;
-            bench --site {{ $site }} migrate {{ if $.Values.jobs.migrateMultipleSites.skipFailing }}--skip-failing{{ end }};
-            bench --site {{ $site }} set-maintenance-mode off;
+            bench --site {{ $site.name }} set-maintenance-mode on;
+            bench --site {{ $site.name }} migrate {{ if $.Values.jobs.migrateMultipleSites.skipFailing }}--skip-failing{{ end }};
+            bench --site {{ $site.name }} set-maintenance-mode off;
             {{- end }}
         resources:
           {{- toYaml .Values.jobs.migrateMultipleSites.resources | nindent 10 }}
